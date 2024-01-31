@@ -1,0 +1,86 @@
+# Guide to Building Local Transcription App
+
+**USER**
+
+I would like to use Whisper to create an app that transcribes zoom meetings processing data locally on my laptop. The app is for personal use within my company. I do not wan to integrate directly with Zoom. Summarize the product architecture.
+
+**ASSISTANT**
+
+To create an app that transcribes Zoom meetings using Whisper while processing data locally on your laptop, the following product architecture can be used:
+
+1. Audio capture: First, you need a mechanism to capture the audio from the ongoing Zoom meeting. A virtual audio cable or a virtual audio driver can help in routing the audio from Zoom to your app.
+2. Audio preprocessing: Before feeding the audio to the Whisper ASR system, you may need to preprocess it. This includes tasks like audio segmentation (to separate speakers) and noise reduction to provide clean audio input for transcription.
+3. Whisper ASR integration: Integrate the Whisper ASR system into your app to transcribe the preprocessed audio. As you want to process the data locally on your laptop, you will need to use the Whisper ASR on-device solution rather than relying on a cloud-based API.
+4. Transcription output: The transcribed text from Whisper ASR can be displayed in real-time or stored in a file format of your choice (e.g., text, JSON, or SRT) for further analysis or sharing.
+5. Speaker identification (optional): If you want to identify different speakers in the transcription, you can incorporate a speaker diarization algorithm to your app. This will help in attributing the transcribed text to the correct speaker, making the final output more organized and easier to understand.
+6. Post-processing and summarization (optional): After obtaining the transcriptions, you can implement additional features like automatic summarization or keyword extraction. This can help you quickly understand the main points discussed during the meeting or easily navigate through the transcription.
+7. User interface: Develop a user-friendly interface for your app that allows users to start and stop the transcription process, view real-time transcriptions, access saved transcriptions, and adjust settings like audio input source and output file format.
+8. Local storage: As the app is for personal use within your company, ensure that all the transcriptions and related data are stored locally on your laptop or a secure network drive, maintaining privacy and security.
+9. Error handling and recovery: Implement error handling mechanisms to ensure your app can recover from unexpected issues like audio input failures, ASR errors, or other technical problems.
+10. Testing and optimization: Test your app thoroughly with different types of Zoom meetings, audio quality, and speakers to ensure accurate and reliable transcriptions. Optimize the app's performance by fine-tuning the audio preprocessing and ASR parameters to achieve the best possible transcription quality.
+
+By following this product architecture, you can build a robust and efficient app for transcribing Zoom meetings using Whisper while processing data locally on your laptop.
+
+USER
+
+Give me the code in python to implement this.
+
+ASSISTANT
+
+Creating a complete app with all the mentioned features would require a significant amount of code. However, I can provide you with a basic example that captures audio and transcribes it using a hypothetical `WhisperASR` module. This example can be a starting point for building your app.
+
+Please note that this example assumes you have a `WhisperASR` module that provides on-device ASR functionality. You'll need to replace it with an actual ASR library or OpenAI's Whisper ASR when it becomes available for on-device use.
+
+```
+import pyaudio
+import threading
+from hypothetical_whisper_asr import WhisperASR  # Replace with actual ASR library
+
+# Constants
+CHUNK = 1024
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 16000
+RECORD_SECONDS = 5
+
+# ASR setup
+whisper_asr = WhisperASR()
+
+def audio_callback(in_data, frame_count, time_info, status):
+    # Transcribe audio chunk
+    transcription = whisper_asr.transcribe(in_data)
+    print(transcription)
+    return (in_data, pyaudio.paContinue)
+
+# Initialize PyAudio
+audio = pyaudio.PyAudio()
+
+# Open audio stream
+stream = audio.open(format=FORMAT,
+             channels=CHANNELS,
+             rate=RATE,
+             input=True,
+             frames_per_buffer=CHUNK,
+             stream_callback=audio_callback)
+
+print("Capturing audio and transcribing...")
+
+# Start audio stream
+stream.start_stream()
+
+# Keep the stream active for the specified duration
+try:
+    while True:
+        pass
+except KeyboardInterrupt:
+    # Stop and close the audio stream when interrupted
+    stream.stop_stream()
+    stream.close()
+    audio.terminate()
+
+print("Audio capture and transcription stopped.")
+```
+
+This basic example captures and transcribes audio using the hypothetical `WhisperASR` module. It does not implement the additional features mentioned in the product architecture, such as audio preprocessing, speaker identification, summarization, or user interface. You will need to research and integrate the respective libraries and modules to achieve the desired functionality.
+
+Remember to replace the `hypothetical_whisper_asr` import line and the `WhisperASR` class with an actual ASR library or OpenAI's Whisper ASR when it becomes available for on-device use.
